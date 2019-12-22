@@ -1,0 +1,2 @@
+https://github.com/markjay4k/Audio-Spectrum-Analyzer-in-Python
+https://en.wikipedia.org/wiki/Piano_key_frequencies
