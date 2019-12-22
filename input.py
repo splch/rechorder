@@ -39,6 +39,8 @@ def record():
 
                 key, hz = conv(fs)
                 display(key, hz)
+            else:
+                notes.append('R')
 
     except KeyboardInterrupt:
         p.close(stream)
@@ -56,8 +58,8 @@ def transcribe(notes): # optimize length algorithm
                 i = j
         except IndexError:
             music.append(notes[i] + '-' + str(j-i))
-            print(notes, '\n\n', music)
             i += 1
+    print(music)
 
 # stream constants
 CHUNK = 1024 * 2
