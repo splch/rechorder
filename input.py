@@ -3,76 +3,83 @@ import pyaudio
 import struct
 from scipy.fftpack import fft
 
-notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+def conv(fs):
+    fs_max = -np.sort(-fs)
 
-music = []
+    key = None
+    i = 0
+    while not key:
+        i += 1
+        hz = round((np.where(fs == fs_max[i])[0][0]) * RATE / CHUNK) # convert FFT to hz
+        note = int(round(12 * np.log2(hz/440) + 49)) # hz to note on piano
 
-class rechord(object):
-    def __init__(self):
-        # stream constants
-        self.CHUNK = 1024 * 2
-        self.FORMAT = pyaudio.paInt16
-        self.CHANNELS = 1
-        self.RATE = 22050
-        self.pause = False
-
-        self.notes = []
-        self.hz = None
-
-        # stream object
-        self.p = pyaudio.PyAudio()
-        self.stream = self.p.open(
-            format=self.FORMAT,
-            channels=self.CHANNELS,
-            rate=self.RATE,
-            input=True,
-            output=True,
-            frames_per_buffer=self.CHUNK,
-        )
-
-        self.mic_input()
+        if note > 0 and note < 109:
+            key = note
     
-    def conv(self):
-        fs_max = -np.sort(-self.fs)
+    return key, hz
 
-        self.keys = []
-        i = 0
-        while not self.hz:
-            i += 1
-            hz = (np.where(self.fs == fs_max[i])[0][0]) * self.RATE / self.CHUNK # convert FFT to hz
-            key = int(round(12 * np.log2(hz/440) + 49)) # hz to note on piano
+def display(key, hz):
+    note = scale[(key - 1) % 12] + str((key+8) // 12) # note as string
+    notes.append(note)
 
-            if key > 0 and key < 109:
-                self.key = key
-                self.hz = round(hz)
+    print(note, '\t', hz)
 
-    def display(self):
-        note = notes[(self.key - 1) % 12] + str((self.key+8) // 12) # note as string
-        music.append(note)
+def record():
+    print("stream started\n")
 
-        print(note, '\t', self.hz)
-        self.hz = None
+    try:
+        while True:
+            data = stream.read(CHUNK)
+            data_int = struct.unpack(str(2 * CHUNK) + 'B', data)
+            data_np = np.array(data_int, dtype='b')[::2] + 128
 
-    def mic_input(self):
-        print("stream started\n")
+            if np.percentile(np.abs(data_np), 90) >= 200: # check volume if a note is being played
+                # compute FFT and update line
+                fs = np.abs(fft(data_int)[0:CHUNK])
 
+                key, hz = conv(fs)
+                display(key, hz)
+
+    except KeyboardInterrupt:
+        p.close(stream)
+        print("\n\nstream ended\n\n")
+
+def transcribe(notes): # optimize length algorithm
+    music = []
+    i = j = 0
+    while i < len(notes):
         try:
-            while True:
-                data = self.stream.read(self.CHUNK, exception_on_overflow=False)
-                data_int = struct.unpack(str(2 * self.CHUNK) + 'B', data)
-                data_np = np.array(data_int, dtype='b')[::2] + 128
+            if notes[i] == notes[j]:
+                j += 1
+            else:
+                music.append(notes[i] + '-' + str(j-i))
+                i = j
+        except IndexError:
+            music.append(notes[i] + '-' + str(j-i))
+            print(notes, '\n\n', music)
+            i += 1
 
-                if np.percentile(np.abs(data_np), 90) >= 200: # check volume if a note is being played
-                    # compute FFT and update line
-                    yf = fft(data_int)
-                    self.fs = np.abs(yf[0:self.CHUNK])
+# stream constants
+CHUNK = 1024 * 2
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 22050
 
-                    self.conv()
-                    self.display()
+# stream object
+p = pyaudio.PyAudio()
+stream = p.open(
+    format=FORMAT,
+    channels=CHANNELS,
+    rate=RATE,
+    input=True,
+    output=True,
+    frames_per_buffer=CHUNK,
+)
 
-        except KeyboardInterrupt:
-            self.p.close(self.stream)
-            print(f"\n\nstream ended\n\n{music}")
+scale = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+
+notes = []
 
 if __name__ == "__main__":
-    rechord()
+    record()
+    transcribe(notes)
