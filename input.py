@@ -2,6 +2,7 @@ import numpy as np
 import pyaudio
 import struct
 from scipy.fftpack import fft
+import music21 # install musescore
 
 def conv(fs):
     fs_max = -np.sort(-fs)
@@ -40,26 +41,57 @@ def record():
                 key, hz = conv(fs)
                 display(key, hz)
             else:
-                notes.append('R')
+                # notes.append('r')
+                continue
 
     except KeyboardInterrupt:
         p.close(stream)
         print("\n\nstream ended\n\n")
 
 def transcribe(notes): # optimize length algorithm
+    for i, note in enumerate(notes):
+        octave = int(note[-1])
+
+        if octave == 0:
+            notes[i] = note[:-1].upper() * 4
+        elif octave == 1:
+            notes[i] = note[:-1].upper() * 3
+        elif octave == 2:
+            notes[i] = note[:-1].upper() * 2
+        elif octave == 3:
+            notes[i] = note[:-1].upper()
+        elif octave == 4:
+            notes[i] = note[:-1].lower()
+        elif octave == 5:
+            notes[i] = note[:-1].lower() + "'"
+        elif octave == 6:
+            notes[i] = note[:-1].lower() + "'" * 2
+        elif octave == 7:
+            notes[i] = note[:-1].lower() + "'" * 3
+        elif octave == 8:
+            notes[i] = note[:-1].lower() + "'" * 4
+
     music = []
+    nps = 12 # in 1 second, the program records 12 notes
     i = j = 0
     while i < len(notes):
         try:
             if notes[i] == notes[j]:
                 j += 1
             else:
-                music.append(notes[i] + '-' + str(j-i))
+                dur = str(min([1,2,4,8,16,32], key=lambda x:abs(x-(round(1 / (j - i) * nps)))))
+                music.append(notes[i] + dur)
                 i = j
         except IndexError:
-            music.append(notes[i] + '-' + str(j-i))
+            dur = str(min([1,2,4,8,16,32,64], key=lambda x:abs(x-(round(1 / (j - i) * nps)))))
+            music.append(notes[i] + dur)
+            i = j
             i += 1
-    print(music)
+
+    # print("music21.converter.parse(\"tinynotation: 4/4 " + " ".join(music) + "\").show()")
+
+    music21.converter.parse("tinynotation: 4/4 " + " ".join(music)).show()
+    # octave: 0, CCCC | 1, CCC | 2, CC | 3, C | 4, c| 5, c' | 6, c'' | 7, c''' | 8, c'''' | 
 
 # stream constants
 CHUNK = 1024 * 2
@@ -78,7 +110,7 @@ stream = p.open(
     frames_per_buffer=CHUNK,
 )
 
-scale = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+scale = ["a", "a#", "b", "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#"]
 
 notes = []
 
