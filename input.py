@@ -41,8 +41,8 @@ def record():
                 key, hz = conv(fs)
                 display(key, hz)
             else:
-                # notes.append('r')
-                continue
+                notes.append('r')
+                # continue
 
     except KeyboardInterrupt:
         p.close(stream)
@@ -50,26 +50,29 @@ def record():
 
 def transcribe(notes): # optimize length algorithm
     for i, note in enumerate(notes):
-        octave = int(note[-1])
+        try:
+            octave = int(note[-1])
 
-        if octave == 0:
-            notes[i] = note[:-1].upper() * 4
-        elif octave == 1:
-            notes[i] = note[:-1].upper() * 3
-        elif octave == 2:
-            notes[i] = note[:-1].upper() * 2
-        elif octave == 3:
-            notes[i] = note[:-1].upper()
-        elif octave == 4:
-            notes[i] = note[:-1].lower()
-        elif octave == 5:
-            notes[i] = note[:-1].lower() + "'"
-        elif octave == 6:
-            notes[i] = note[:-1].lower() + "'" * 2
-        elif octave == 7:
-            notes[i] = note[:-1].lower() + "'" * 3
-        elif octave == 8:
-            notes[i] = note[:-1].lower() + "'" * 4
+            if octave == 0:
+                notes[i] = note[:-1].upper() * 4
+            elif octave == 1:
+                notes[i] = note[:-1].upper() * 3
+            elif octave == 2:
+                notes[i] = note[:-1].upper() * 2
+            elif octave == 3:
+                notes[i] = note[:-1].upper()
+            elif octave == 4:
+                notes[i] = note[:-1].lower()
+            elif octave == 5:
+                notes[i] = note[:-1].lower() + "'"
+            elif octave == 6:
+                notes[i] = note[:-1].lower() + "'" * 2
+            elif octave == 7:
+                notes[i] = note[:-1].lower() + "'" * 3
+            elif octave == 8:
+                notes[i] = note[:-1].lower() + "'" * 4
+        except:
+            continue
 
     music = []
     nps = 12 # in 1 second, the program records 12 notes
