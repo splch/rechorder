@@ -15,7 +15,7 @@ def transcribe(notes):
     nps = 12 # in 1 second, the program records 12 notes
     i = 0
     j = 1
-    while i < len(notes):
+    while i < len(notes): # optimize loop
         try:
             if notes[i] == notes[j]:
                 j += 1
@@ -24,10 +24,9 @@ def transcribe(notes):
                 music.append(notes[i] + '-' + dur)
                 i = j
         except IndexError:
-            dur = str(min([1,2,4,8,16,32,64], key=lambda x:abs(x-(round(1 / (j - i) * nps)))))
+            dur = str(min([1,2,4,8,16,32,64], key=lambda x:abs(x-(round(1 / (j - i) * nps))))) # can this cause div 0 error?
             music.append(notes[i] + '-' + dur)
-            i = j
-            i += 1
+            i = j + 1
         
     s = music21.stream.Score()
     s.insert(0, music21.metadata.Metadata())
@@ -69,7 +68,7 @@ def record(rests = True):
         output=True,
         frames_per_buffer=CHUNK,
     )
-    print("recording...\n")
+    print("\nstarted recording...\n")
     notes = ['R']
     try:
         while True:
@@ -85,7 +84,7 @@ def record(rests = True):
                 notes.append('R')
     except KeyboardInterrupt:
         p.close(stream)
-        print("\n\nterminated recording\n\n")
+        print("\n\nended recording\n")
     return notes
 
 # stream constants
