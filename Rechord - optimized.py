@@ -23,11 +23,11 @@ def transcribe(notes):
                 dur = str(min([1,2,4,8,16,32], key=lambda x:abs(x-(round(1 / (j - i) * nps)))))
                 music.append(notes[i] + '-' + dur)
                 i = j
+                j += 1
         except IndexError:
             dur = str(min([1,2,4,8,16,32,64], key=lambda x:abs(x-(round(1 / (j - i) * nps))))) # can this cause div 0 error?
             music.append(notes[i] + '-' + dur)
             i = j + 1
-        
     s = music21.stream.Score()
     s.insert(0, music21.metadata.Metadata())
     s.metadata.title = "title"
