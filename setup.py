@@ -1,7 +1,7 @@
 import setuptools
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+with open('README.md', 'r') as f:
+    long_description = f.read()
 
 setuptools.setup(
     name='rechorder',  
@@ -9,7 +9,7 @@ setuptools.setup(
     scripts=['rechorder'] ,
     author="Spencer Churchill",
     author_email="spencer.l.churchill@gmail.com",
-    description="A microphone to sheet music converter",
+    description="A microphone to sheet music converter.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/splch/rechorder",
