@@ -352,5 +352,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 .DS_Store
-.ipynb_checkpoints/Rechord-checkpoint.ipynb
-.ipynb_checkpoints/Rechord - demo-checkpoint.ipynb
+.ipynb_checkpoints/Rechorder-checkpoint.ipynb
+.ipynb_checkpoints/Rechorder - demo-checkpoint.ipynb

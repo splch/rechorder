@@ -1,0 +1,8 @@
+LICENSE
+README.md
+rechorder
+setup.py
+rechorder.egg-info/PKG-INFO
+rechorder.egg-info/SOURCES.txt
+rechorder.egg-info/dependency_links.txt
+rechorder.egg-info/top_level.txt
