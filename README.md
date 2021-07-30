@@ -1,6 +1,6 @@
 # ReChord  — Convert Mic to Music
 
-Puts the us in Mic :wink: jk sry
+Puts the us in Mic 😉 jk sry
 
 ## Requirements
 1. Install [musescore](https://musescore.org/en/handbook/3/installation).
